@@ -40,6 +40,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         data.update({
             'username': self.user.username,
             'email': self.user.email,
-            'profile_image': str(self.user.profile_image) if self.user.profile_image else None
+            'profile_image': str(self.user.profile_image) if self.user.profile_image else None,
+            'first_name': self.user.first_name,
+            'last_name': self.user.last_name,
         })
         return data

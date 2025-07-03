@@ -7,7 +7,6 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     profile_image = CloudinaryField('image', folder='ucode/profile_images',
                                     default='ucode/profile_images/hyqi9y5ucjmgigtlrmth', overwrite=True)
-    # courses = models.ManyToManyField(Course, related_name='users', through='UserCourse')
     list_display = ('username', 'email', 'date', 'profile_image')
 
     def __str__(self):
