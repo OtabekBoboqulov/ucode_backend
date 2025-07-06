@@ -3,7 +3,7 @@ from datetime import datetime
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from user.models import CustomUser
-from courses.models import Course
+from courses.models import Course, Lesson
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -19,6 +19,12 @@ class CourseSerializer(serializers.ModelSerializer):
         months = days // 30
         years = days // 365
         return {'days': days, 'months': months, 'years': years}
+
+
+class LessonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Lesson
+        fields = '__all__'
 
 
 class SignupSerializer(serializers.ModelSerializer):

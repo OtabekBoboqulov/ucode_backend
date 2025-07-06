@@ -4,7 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Course
-from api.serializers import CourseSerializer
+from api.serializers import CourseSerializer, LessonSerializer
 from api.decorators import staff_required
 
 
@@ -23,3 +23,15 @@ def courses_create(request):
         course_serialized.save()
         return Response(course_serialized.data)
     return Response(course_serialized.errors)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def courses_details(request, course_id):
+    course = Course.objects.get(id=course_id)
+    if request.user not in course.learners.all():
+        course.learners.add(request.user)
+    course_serialized = CourseSerializer(course)
+    lessons = course.lessons.all()
+    lessons_serialized = LessonSerializer(lessons, many=True)
+    return Response({'course': course_serialized.data, 'lessons': lessons_serialized.data})
