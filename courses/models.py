@@ -29,6 +29,7 @@ class Lesson(models.Model):
     serial_number = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     students = models.ManyToManyField(CustomUser, related_name='lessons', through=UserLesson)
+    lesson_materials = CloudinaryField('materials', folder='ucode/lesson_materials', blank=True, null=True)
 
     def __str__(self):
         return f'{self.course.name}: {self.serial_number}. {self.title}'
@@ -53,28 +54,43 @@ class Component(models.Model):
 
 class Video(Component):
     video_url = models.URLField()
-    type = 'video'
+
+    def save(self, *args, **kwargs):
+        self.type = 'video'
+        super().save(*args, **kwargs)
 
 
 class Text(Component):
     content = models.TextField()
-    type = 'text'
+
+    def save(self, *args, **kwargs):
+        self.type = 'text'
+        super().save(*args, **kwargs)
 
 
 class MultipleChoiceQuestion(Component):
     question = models.TextField()
-    type = 'mcq'
+
+    def save(self, *args, **kwargs):
+        self.type = 'mcq'
+        super().save(*args, **kwargs)
 
 
 class MultipleOptionsQuestion(Component):
     question = models.TextField()
-    type = 'moq'
+
+    def save(self, *args, **kwargs):
+        self.type = 'moq'
+        super().save(*args, **kwargs)
 
 
 class CodingQuestion(Component):
     question = models.TextField()
-    type = 'coding'
-    students = models.ManyToManyField(CustomUser, related_name='coding_questions')
+    students = models.ManyToManyField(CustomUser, related_name='coding_questions', null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.type = 'coding'
+        super().save(*args, **kwargs)
 
 
 class MultipleChoiceOption(models.Model):

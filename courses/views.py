@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Course
-from api.serializers import CourseSerializer, LessonSerializer
+from .models import Course, Lesson
+from api.serializers import CourseSerializer, LessonSerializer, UserLessonSerializer
 from api.decorators import staff_required
 
 
@@ -32,6 +32,14 @@ def courses_details(request, course_id):
     if request.user not in course.learners.all():
         course.learners.add(request.user)
     course_serialized = CourseSerializer(course)
-    lessons = course.lessons.all()
+    lessons = course.lessons.all().order_by('serial_number')
     lessons_serialized = LessonSerializer(lessons, many=True)
     return Response({'course': course_serialized.data, 'lessons': lessons_serialized.data})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def lessons_details(request, lesson_id):
+    lesson = Lesson.objects.get(id=lesson_id)
+    lesson_serialized = LessonSerializer(lesson)
+    return Response(lesson_serialized.data)

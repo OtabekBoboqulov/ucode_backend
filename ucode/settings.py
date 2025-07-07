@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'cloudinary_storage',
     'corsheaders',
+    'drf_polymorphic',
     'user',
     'courses',
 ]
