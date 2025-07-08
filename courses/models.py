@@ -1,7 +1,7 @@
 from django.core.validators import MaxValueValidator
 from django.db import models
 from cloudinary.models import CloudinaryField
-from user.models import CustomUser, UserCourse, UserLesson
+from user.models import CustomUser, UserCourse, UserLesson, UserComponent
 
 
 class Course(models.Model):
@@ -47,6 +47,7 @@ class Component(models.Model):
     type = models.CharField(max_length=15, choices=TYPE_CHOICES)
     max_score = models.PositiveIntegerField()
     serial_number = models.PositiveIntegerField()
+    student = models.ManyToManyField(CustomUser, related_name='components', through=UserComponent)
 
     def __str__(self):
         return f'{self.lesson}: {self.type}'

@@ -34,6 +34,12 @@ class UserLesson(models.Model):
         return f'{self.user.username} - {self.lesson.title}'
 
 
+class UserComponent(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    component = models.ForeignKey('courses.Component', on_delete=models.CASCADE)
+    score = models.PositiveIntegerField(default=0)
+
+
 class UserAnswer(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     question = models.ForeignKey('courses.CodingQuestion', on_delete=models.CASCADE)

@@ -98,8 +98,6 @@ class ComponentSerializer(serializers.ModelSerializer):
         fields = ('id', 'lesson', 'type', 'max_score', 'serial_number', 'data')
 
     def get_data(self, obj):
-        print(f"Serializing component: id={obj.id}, type={obj.type}, model={type(obj).__name__}")
-        # Cast to child model based on type
         type_map = {
             'video': Video,
             'text': Text,
@@ -111,7 +109,6 @@ class ComponentSerializer(serializers.ModelSerializer):
         if child_model:
             try:
                 child_instance = child_model.objects.get(id=obj.id)
-                print(f"Cast to child model: {type(child_instance).__name__}")
                 if isinstance(child_instance, Video):
                     return VideoSerializer(child_instance).data
                 elif isinstance(child_instance, Text):
@@ -123,9 +120,7 @@ class ComponentSerializer(serializers.ModelSerializer):
                 elif isinstance(child_instance, CodingQuestion):
                     return CodingQuestionSerializer(child_instance).data
             except child_model.DoesNotExist:
-                print(f"Child model {child_model.__name__} not found for id={obj.id}")
                 return {}
-        print(f"No matching child model for type={obj.type}")
         return {}
 
 
