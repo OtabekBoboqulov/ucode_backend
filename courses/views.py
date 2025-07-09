@@ -62,12 +62,25 @@ def lessons_start(request, lesson_id):
     )
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def lessons_next(request, course_id, serial_number):
+    course = Course.objects.get(id=course_id)
+    if course.lessons.all().filter(serial_number=serial_number+1).exists():
+        lesson = course.lessons.get(serial_number=serial_number+1)
+        id = lesson.id
+        return Response({'id': id})
+    else:
+        return Response({'id': 0})
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def task_check(request, component_id):
     component = Component.objects.get(id=component_id)
     user_lesson = UserLesson.objects.get(user=request.user, lesson=component.lesson)
     has_user_component = UserComponent.objects.filter(user=request.user, component=component).exists()
+    is_correct = False
     if has_user_component:
         user_component = UserComponent.objects.get(user=request.user, component=component)
         user_lesson.score -= user_component.score
@@ -77,6 +90,7 @@ def task_check(request, component_id):
         if request.data['answer'] == 'true':
             user_lesson.score += component.max_score
             user_component.score = component.max_score
+            is_correct = True
         else:
             user_component.score = 0
     elif component.type == 'moq':
@@ -86,6 +100,7 @@ def task_check(request, component_id):
         if len(user_answer) == answers and 'false' not in user_answer:
             user_lesson.score += component.max_score
             user_component.score = component.max_score
+            is_correct = True
         else:
             user_component.score = 0
     user_component.save()
@@ -94,5 +109,13 @@ def task_check(request, component_id):
     else:
         user_lesson.is_completed = False
     user_lesson.save()
-    print(user_lesson.score, user_lesson.is_completed)
-    return Response({'message': 'Task checked successfully'})
+    return Response({'is_correct': is_correct})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def courses_lessons(request, course_id):
+    course = Course.objects.get(id=course_id)
+    lessons = course.lessons.all().order_by('serial_number')
+    lessons_serialized = LessonSerializer(lessons, many=True)
+    return Response(lessons_serialized.data)
