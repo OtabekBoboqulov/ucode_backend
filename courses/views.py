@@ -1,8 +1,10 @@
+import json
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Course, Lesson, Component, MultipleOptionsQuestion
+from .models import Course, Lesson, Component, MultipleChoiceQuestion, MultipleOptionsQuestion, Video, Text, \
+    MultipleChoiceOption, MultipleOptionsOption
 from user.models import UserLesson, UserComponent
 from api.serializers import CourseSerializer, LessonSerializer, UserLessonSerializer
 from api.decorators import staff_required
@@ -52,7 +54,8 @@ def lessons_start(request, lesson_id):
         return Response({'message': 'Lesson already started'})
     lesson = Lesson.objects.get(id=lesson_id)
     user_lesson = UserLesson(user=request.user, lesson=lesson)
-    user_lesson.score = sum([component.max_score for component in lesson.components.all() if component.type in ['video', 'text']])
+    user_lesson.score = sum(
+        [component.max_score for component in lesson.components.all() if component.type in ['video', 'text']])
     user_lesson.save()
     return Response(
         {
@@ -66,8 +69,8 @@ def lessons_start(request, lesson_id):
 @permission_classes([IsAuthenticated])
 def lessons_next(request, course_id, serial_number):
     course = Course.objects.get(id=course_id)
-    if course.lessons.all().filter(serial_number=serial_number+1).exists():
-        lesson = course.lessons.get(serial_number=serial_number+1)
+    if course.lessons.all().filter(serial_number=serial_number + 1).exists():
+        lesson = course.lessons.get(serial_number=serial_number + 1)
         id = lesson.id
         return Response({'id': id})
     else:
@@ -119,3 +122,44 @@ def courses_lessons(request, course_id):
     lessons = course.lessons.all().order_by('serial_number')
     lessons_serialized = LessonSerializer(lessons, many=True)
     return Response(lessons_serialized.data)
+
+
+@api_view(['POST'])
+@staff_required
+def lessons_create(request):
+    data = request.data
+    course = Course.objects.get(id=data['course_id'])
+    lesson = Lesson(course=course, serial_number=data['serial_number'], title=data['title'],
+                    max_score=data['max_score'])
+    if data.get('lesson_materials'):
+        lesson.lesson_materials = data['lesson_materials']
+    lesson.save()
+    components = json.loads(data['components'])
+    for component in components:
+        if component['type'] == 'video':
+            video_component = Video(lesson=lesson, max_score=component['max_score'],
+                                    serial_number=component['serial_number'], video_url=component['video_url'])
+            video_component.save()
+        elif component['type'] == 'text':
+            text_component = Text(lesson=lesson, max_score=component['max_score'],
+                                  serial_number=component['serial_number'], content=component['content'])
+            text_component.save()
+        elif component['type'] == 'mcq':
+            mcq_component = MultipleChoiceQuestion(lesson=lesson, max_score=component['max_score'],
+                                                   serial_number=component['serial_number'],
+                                                   question=component['question'])
+            mcq_component.save()
+            for option in component['options']:
+                mcq_option = MultipleChoiceOption(question=mcq_component, is_correct=option['is_correct'],
+                                                  option=option['option'])
+                mcq_option.save()
+        elif component['type'] == 'moq':
+            moq_component = MultipleOptionsQuestion(lesson=lesson, max_score=component['max_score'],
+                                                    serial_number=component['serial_number'],
+                                                    question=component['question'])
+            moq_component.save()
+            for option in component['options']:
+                moq_option = MultipleOptionsOption(question=moq_component, is_correct=option['is_correct'],
+                                                   option=option['option'])
+                moq_option.save()
+    return Response({'message': 'Lesson created successfully'})
