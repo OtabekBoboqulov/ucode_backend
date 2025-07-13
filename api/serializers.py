@@ -3,15 +3,24 @@ from datetime import datetime
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from drf_polymorphic.serializers import PolymorphicSerializer
-from user.models import CustomUser, UserLesson
+from user.models import CustomUser, UserLesson, UserCourse
 from courses.models import (
     Course, Lesson, Component, Video, Text, MultipleChoiceQuestion, MultipleOptionsQuestion, CodingQuestion,
     MultipleChoiceOption, MultipleOptionsOption, CodingTest
 )
 
 
+class UserCourseSerializer(serializers.ModelSerializer):
+    course = serializers.StringRelatedField()
+
+    class Meta:
+        model = UserCourse
+        fields = '__all__'
+
+
 class CourseSerializer(serializers.ModelSerializer):
     time_since_creation = serializers.SerializerMethodField()
+    user_courses = UserCourseSerializer(source='usercourse_set', many=True, read_only=True)
 
     class Meta:
         model = Course

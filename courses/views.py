@@ -5,7 +5,7 @@ from rest_framework.response import Response
 
 from .models import Course, Lesson, Component, MultipleChoiceQuestion, MultipleOptionsQuestion, Video, Text, \
     MultipleChoiceOption, MultipleOptionsOption
-from user.models import UserLesson, UserComponent
+from user.models import UserLesson, UserComponent, UserCourse
 from api.serializers import CourseSerializer, LessonSerializer, UserLessonSerializer
 from api.decorators import staff_required
 
@@ -82,6 +82,7 @@ def lessons_next(request, course_id, serial_number):
 def task_check(request, component_id):
     component = Component.objects.get(id=component_id)
     user_lesson = UserLesson.objects.get(user=request.user, lesson=component.lesson)
+    user_course = UserCourse.objects.get(user=request.user, course=component.lesson.course)
     has_user_component = UserComponent.objects.filter(user=request.user, component=component).exists()
     is_correct = False
     if has_user_component:
@@ -109,6 +110,14 @@ def task_check(request, component_id):
     user_component.save()
     if user_lesson.score >= 80:
         user_lesson.is_completed = True
+        user_course.progress += component.lesson.max_score
+        if user_course.progress >= 100:
+            user_course.is_completed = True
+        user_course.save()
+    elif user_lesson.is_completed:
+        user_course.progress -= component.lesson.max_score
+        user_lesson.is_completed = False
+        user_course.save()
     else:
         user_lesson.is_completed = False
     user_lesson.save()

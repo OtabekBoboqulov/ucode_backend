@@ -39,4 +39,5 @@ class LogoutView(APIView):
 def user_courses(request):
     courses = request.user.courses.all()
     course_ids = [course.id for course in courses]
-    return Response(course_ids)
+    courses_serialized = CourseSerializer(courses, many=True)
+    return Response({'enrolled_courses_ids': course_ids, 'enrolled_courses': courses_serialized.data})
