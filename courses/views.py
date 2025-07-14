@@ -39,6 +39,14 @@ def courses_details(request, course_id):
     return Response({'course': course_serialized.data, 'lessons': lessons_serialized.data})
 
 
+@api_view(['DELETE'])
+@staff_required
+def courses_delete(request, course_id):
+    course = Course.objects.get(id=course_id)
+    course.delete()
+    return Response({'message': 'Kurs muvaffaqiyatli o`chirildi'})
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def lessons_details(request, lesson_id):
@@ -75,6 +83,14 @@ def lessons_next(request, course_id, serial_number):
         return Response({'id': id})
     else:
         return Response({'id': 0})
+
+
+@api_view(['DELETE'])
+@staff_required
+def lessons_delete(request, lesson_id):
+    course = Lesson.objects.get(id=lesson_id)
+    course.delete()
+    return Response({'message': 'Dars muvaffaqiyatli o`chirildi'})
 
 
 @api_view(['POST'])
