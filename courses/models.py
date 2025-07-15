@@ -110,3 +110,13 @@ class CodingTest(models.Model):
     question = models.ForeignKey(CodingQuestion, on_delete=models.CASCADE, related_name='tests')
     input = models.TextField()
     output = models.TextField()
+
+
+class Certificate(models.Model):
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    issue_date = models.DateField(auto_now_add=True)
+    certificate_id = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return f"{self.student.username} - {self.course.name} - {self.certificate_id}"

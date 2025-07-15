@@ -1,12 +1,19 @@
 import json
+import uuid
+
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from weasyprint import HTML
 
 from .models import Course, Lesson, Component, MultipleChoiceQuestion, MultipleOptionsQuestion, Video, Text, \
-    MultipleChoiceOption, MultipleOptionsOption
+    MultipleChoiceOption, MultipleOptionsOption, Certificate
 from user.models import UserLesson, UserComponent, UserCourse
-from api.serializers import CourseSerializer, LessonSerializer, UserLessonSerializer
+from api.serializers import CourseSerializer, LessonSerializer, UserLessonSerializer, CertificateSerializer
 from api.decorators import staff_required
 
 
@@ -188,3 +195,56 @@ def lessons_create(request):
                                                    option=option['option'])
                 moq_option.save()
     return Response({'message': 'Lesson created successfully'})
+
+
+class GenerateCertificateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, course_id):
+        try:
+            course = Course.objects.get(id=course_id)
+            user = request.user
+
+            user_course = UserCourse.objects.get(user=user, course=course)
+            if not user_course.is_completed:
+                return Response({'message': 'Kurs kugatilmagan'}, status=status.HTTP_400_BAD_REQUEST)
+
+            if Certificate.objects.filter(student=user, course=course).exists():
+                certificate = Certificate.objects.get(student=user, course=course)
+                certificate_id = certificate.certificate_id
+            else:
+                certificate_id = str(uuid.uuid4())
+                certificate = Certificate.objects.create(
+                    student=user,
+                    course=course,
+                    certificate_id=certificate_id
+                )
+
+            serializer = CertificateSerializer(certificate)
+
+            context = {
+                'recipient_name': user.get_full_name() or user.username,
+                'course_name': course.name,
+                'issue_date': certificate.issue_date.strftime('%B %d, %Y'),
+                'certificate_id': certificate_id
+            }
+            html_string = render_to_string('certificate_template.html', context)
+
+            # Generate PDF, respecting the template's @page settings
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = f'attachment; filename="certificate_{certificate.certificate_id}.pdf"'
+            HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(
+                response,
+                stylesheets=[],
+                presentational_hints=True,
+                margin_left=0,
+                margin_right=0,
+                margin_top=0,
+                margin_bottom=0
+            )
+
+            return response
+        except Course.DoesNotExist:
+            return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+        except UserCourse.DoesNotExist:
+            return Response({'message': 'User course not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -6,7 +6,7 @@ from drf_polymorphic.serializers import PolymorphicSerializer
 from user.models import CustomUser, UserLesson, UserCourse
 from courses.models import (
     Course, Lesson, Component, Video, Text, MultipleChoiceQuestion, MultipleOptionsQuestion, CodingQuestion,
-    MultipleChoiceOption, MultipleOptionsOption, CodingTest
+    MultipleChoiceOption, MultipleOptionsOption, CodingTest, Certificate
 )
 
 
@@ -175,6 +175,15 @@ class SignupSerializer(serializers.ModelSerializer):
             user.profile_image = profile_image
             user.save()
         return user
+
+
+class CertificateSerializer(serializers.ModelSerializer):
+    student = serializers.StringRelatedField(read_only=True)
+    course = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Certificate
+        fields = '__all__'
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
