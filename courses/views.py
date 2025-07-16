@@ -54,6 +54,23 @@ def courses_delete(request, course_id):
     return Response({'message': 'Kurs muvaffaqiyatli o`chirildi'})
 
 
+@api_view(['GET', 'PUT'])
+@staff_required
+def courses_update(request, course_id):
+    course = Course.objects.get(id=course_id)
+    if request.method == 'GET':
+        course_serialized = CourseSerializer(course)
+        return Response(course_serialized.data)
+    elif request.method == 'PUT':
+        course_serialized = CourseSerializer(course, data=request.data)
+        if course_serialized.is_valid():
+            course_serialized.save()
+            return Response(course_serialized.data)
+        return Response(course_serialized.errors)
+    return Response({'message': 'Method not allowed'})
+
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def lessons_details(request, lesson_id):
