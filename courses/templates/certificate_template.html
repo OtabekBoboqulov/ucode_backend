@@ -90,6 +90,10 @@
           display: flex;
           flex-direction: column;
         }
+
+        .qrcode {
+          width: 150px !important;
+        }
     </style>
 </head>
 <body>
@@ -117,6 +121,7 @@
         <div class="logo-signature">
             <img src="https://res.cloudinary.com/bnf404/image/upload/v1752720135/ucode/logo_dark_pitqdo.png"
                  alt="MuCode">
+            <img src="data:image/png;base64,{{ qr_code }}" alt="Verify Certificate" class="qrcode">
             <div class="signature">
                 <img src="https://res.cloudinary.com/bnf404/image/upload/v1752753606/ucode/6b00c73e-8a31-4ede-bed2-0aadeac4967e.png"
                      alt="signature">

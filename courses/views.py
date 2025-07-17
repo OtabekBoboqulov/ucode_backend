@@ -1,6 +1,8 @@
+import base64
 import json
 import uuid
-
+from io import BytesIO
+import qrcode
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from rest_framework import status
@@ -9,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from weasyprint import HTML
+from django.conf import settings
 
 from .models import Course, Lesson, Component, MultipleChoiceQuestion, MultipleOptionsQuestion, Video, Text, \
     MultipleChoiceOption, MultipleOptionsOption, Certificate
@@ -239,11 +242,26 @@ class GenerateCertificateView(APIView):
 
             serializer = CertificateSerializer(certificate)
 
+            verification_url = f'{request.build_absolute_uri(settings.BASE_URL)}/api/verify-certificate/{certificate_id}/'
+            qr = qrcode.QRCode(
+                version=1,
+                error_correction=qrcode.constants.ERROR_CORRECT_L,
+                box_size=10,
+                border=4,
+            )
+            qr.add_data(verification_url)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color="darkblue", back_color="white")
+            buffered = BytesIO()
+            img.save(buffered, format="PNG")
+            qr_code_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
             context = {
                 'recipient_name': user.get_full_name() or user.username,
                 'course_name': course.name,
                 'issue_date': certificate.issue_date.strftime('%B %d, %Y'),
-                'certificate_id': certificate_id
+                'certificate_id': certificate_id,
+                'qr_code': qr_code_base64,
             }
             html_string = render_to_string('certificate_template.html', context)
 
@@ -265,3 +283,13 @@ class GenerateCertificateView(APIView):
             return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
         except UserCourse.DoesNotExist:
             return Response({'message': 'User course not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+def verify_certificate(request, certificate_id):
+    try:
+        certificate = Certificate.objects.get(certificate_id=certificate_id)
+        certificate_serialized = CertificateSerializer(certificate)
+        return Response(certificate_serialized.data)
+    except Certificate.DoesNotExist:
+        return Response({'message': 'Sertifikat mavjud emas'}, status=status.HTTP_404_NOT_FOUND)

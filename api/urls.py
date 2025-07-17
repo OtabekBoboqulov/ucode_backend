@@ -3,7 +3,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from user.views import SignupView, CustomTokenObtainPairView, LogoutView, user_courses, user_update
 from courses.views import (
     courses_index, courses_create, courses_details, lessons_details, lessons_start, task_check, courses_lessons,
-    lessons_next, lessons_create, courses_delete, lessons_delete, GenerateCertificateView, courses_update
+    lessons_next, lessons_create, courses_delete, lessons_delete, GenerateCertificateView, courses_update,
+    verify_certificate
 )
 
 urlpatterns = [
@@ -26,4 +27,5 @@ urlpatterns = [
     path('lessons/create/', lessons_create),
     path('task-check/<int:component_id>/', task_check),
     path('profile/edit/', user_update),
+    path('verify-certificate/<str:certificate_id>/', verify_certificate),
 ]
