@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
+import cloudinary.uploader
 from api.serializers import SignupSerializer, CustomTokenObtainPairSerializer, CourseSerializer
 from .models import CustomUser
 from courses.models import Course
@@ -41,3 +42,21 @@ def user_courses(request):
     course_ids = [course.id for course in courses]
     courses_serialized = CourseSerializer(courses, many=True)
     return Response({'enrolled_courses_ids': course_ids, 'enrolled_courses': courses_serialized.data})
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def user_update(request):
+    user = request.user
+    data = request.data
+    user.first_name = data['first_name']
+    user.last_name = data['last_name']
+    user.username = data['username']
+    user.email = data['email']
+    if data.get('profile_image'):
+        if user.profile_image != 'ucode/profile_images/hyqi9y5ucjmgigtlrmth':
+            cloudinary.uploader.destroy(user.profile_image.public_id)
+        user.profile_image = data['profile_image']
+    user.save()
+    image_url = user.profile_image.url
+    return Response({'message': 'User updated successfully', 'profile_image': image_url})

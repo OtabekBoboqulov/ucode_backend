@@ -1,125 +1,135 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Certificate</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Tektur:wght@400..900&display=swap" rel="stylesheet">
-  <style>
-    @page {
-      size: A4 landscape;  /* Enforce landscape orientation */
-      margin: 0;          /* Remove all margins */
-    }
-    * {
-      margin: 0;
-      padding: 0;
-    }
+    <title>Certificate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Tektur:wght@400..900&display=swap"
+          rel="stylesheet">
+    <style>
+        @page {
+          size: A4 landscape;  /* Enforce landscape orientation */
+          margin: 0;          /* Remove all margins */
+        }
+        * {
+          margin: 0;
+          padding: 0;
+        }
+    
+        .container {
+          background-image: url("https://res.cloudinary.com/bnf404/image/upload/v1752563013/ucode/bg_cvzyee.jpg");
+          background-size: cover;
+          background-repeat: no-repeat;
+          /* Remove fixed width and height, let @page define size */
+          min-width: 29.7cm;  /* A4 width in landscape */
+          min-height: 21cm;   /* A4 height in landscape */
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: white;
+          font-family: "Tektur", sans-serif;
+        }
+    
+        .main {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          row-gap: 20px;
+        }
+    
+        .certificate_text {
+          font-family: "Audiowide", sans-serif;
+          font-weight: 400;
+          font-style: normal;
+          font-size: 100px;
+          color: #12F1FF;
+        }
+    
+        .student_name,
+        .course_name {
+          font-size: 60px;
+          color: #12F1FF;
+        }
+    
+        .student_name {
+          border-bottom: 2px solid #12F1FF;
+        }
+    
+        .message {
+          font-size: 25px;
+        }
+    
+        .disclaimer {
+          font-size: 12px;
+        }
+    
+        .logo-signature {
+          padding: 10px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          width: 600px;
+        }
+    
+        .logo-signature img {
+          width: 200px;
+        }
+    
+        .certificate-code {
+          font-size: 10px;
+          margin-top: 20px;
+        }
+    
+        .certificate-date {
+          color: #12F1FF;
+        }
 
-    .container {
-      background-image: url("https://res.cloudinary.com/bnf404/image/upload/v1752563013/ucode/bg_cvzyee.jpg");
-      background-size: cover;
-      background-repeat: no-repeat;
-      /* Remove fixed width and height, let @page define size */
-      min-width: 29.7cm;  /* A4 width in landscape */
-      min-height: 21cm;   /* A4 height in landscape */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-family: "Tektur", sans-serif;
-    }
-
-    .main {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      row-gap: 20px;
-    }
-
-    .certificate_text {
-      font-family: "Audiowide", sans-serif;
-      font-weight: 400;
-      font-style: normal;
-      font-size: 100px;
-      color: #12F1FF;
-    }
-
-    .student_name,
-    .course_name {
-      font-size: 60px;
-      color: #12F1FF;
-    }
-
-    .student_name {
-      border-bottom: 2px solid #12F1FF;
-    }
-
-    .message {
-      font-size: 25px;
-    }
-
-    .disclaimer {
-      font-size: 10px;
-    }
-
-    .logo-signature {
-      padding: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 600px;
-    }
-
-    .logo-signature img {
-      width: 200px;
-    }
-
-    .certificate-code {
-      font-size: 10px;
-      margin-top: 20px;
-    }
-
-    .certificate-date {
-      color: #12F1FF;
-    }
-  </style>
+        .signature {
+          display: flex;
+          flex-direction: column;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-  <div class="main">
-    <div class="course_name">
-      {{ course_name }}
+    <div class="main">
+        <div class="course_name">
+            {{ course_name }}
+        </div>
+        <div class="message">
+            kursini tugatganligi uchun
+        </div>
+        <div class="student_name">
+            {{ recipient_name }}
+        </div>
+        <div class="certificate_text">
+            Sertifikat
+        </div>
+        <div class="message">
+            bilan taqdirlanadi.
+        </div>
+        <div class="disclaimer">
+            Sertifikatni sohtalashtirish ta`qiqlanadi. Bu turdagi sertifikatlar faqat mucode.uz platformasi tomonidan
+            berilishi mumkin.
+        </div>
+        <div class="logo-signature">
+            <img src="https://res.cloudinary.com/bnf404/image/upload/v1752720135/ucode/logo_dark_pitqdo.png"
+                 alt="MuCode">
+            <div class="signature">
+                <img src="https://res.cloudinary.com/bnf404/image/upload/v1752753606/ucode/6b00c73e-8a31-4ede-bed2-0aadeac4967e.png"
+                     alt="signature">
+                Mamatqulova Ulug'bek
+            </div>
+        </div>
     </div>
-    <div class="message">
-      kursini tugatganligi uchun
+    <div class="certificate-date">
+        {{ issue_date }}
     </div>
-    <div class="student_name">
-      {{ recipient_name }}
+    <div class="certificate-code">
+        code: {{ certificate_id }}
     </div>
-    <div class="certificate_text">
-      Sertifikat
-    </div>
-    <div class="message">
-      bilan taqdirlanadi.
-    </div>
-    <div class="disclaimer">
-      Sertifikatni sohtalashtirish taqiqlanadi. Bu turdagi sertifikatlar faqat mucode.uz platformasi tomonidan berilishi mumkin.
-    </div>
-    <div class="logo-signature">
-      <img src="https://res.cloudinary.com/bnf404/image/upload/v1752720135/ucode/logo_dark_pitqdo.png" alt="MuCode">
-      <div class="signature">
-        Mamatqulova Ulug'bek
-      </div>
-    </div>
-  </div>
-  <div class="certificate-date">
-    {{ issue_date }}
-  </div>
-  <div class="certificate-code">
-    code: {{ certificate_id }}
-  </div>
 </div>
 </body>
 </html>
