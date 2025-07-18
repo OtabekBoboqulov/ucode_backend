@@ -1,5 +1,6 @@
 import os
 import cloudinary.api
+import dj_database_url
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
@@ -16,8 +17,8 @@ BASE_URL = 'http://localhost:8000'
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = config('DEBUG', default=False, cast=bool)
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
+# DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 # Application definition
@@ -76,11 +77,17 @@ WSGI_APPLICATION = 'ucode.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+CSRF_TRUSTED_ORIGINS = ['https://web-production-d4808.up.railway.app/']
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=1800)
 }
 
 # Password validation
