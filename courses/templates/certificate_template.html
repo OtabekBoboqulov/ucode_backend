@@ -92,7 +92,8 @@
         }
 
         .qrcode {
-          width: 150px !important;
+          margin-top: 10px;
+          width: 120px !important;
         }
     </style>
 </head>
@@ -121,7 +122,6 @@
         <div class="logo-signature">
             <img src="https://res.cloudinary.com/bnf404/image/upload/v1752720135/ucode/logo_dark_pitqdo.png"
                  alt="MuCode">
-            <img src="data:image/png;base64,{{ qr_code }}" alt="Verify Certificate" class="qrcode">
             <div class="signature">
                 <img src="https://res.cloudinary.com/bnf404/image/upload/v1752753606/ucode/6b00c73e-8a31-4ede-bed2-0aadeac4967e.png"
                      alt="signature">
@@ -134,6 +134,11 @@
     </div>
     <div class="certificate-code">
         code: {{ certificate_id }}
+    </div>
+    <div>
+        <!--        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.b51Dv6nVMjWntrwxD7VEiwHaHa%3Fpid%3DApi&f=1&ipt=c8a88290c4ec463af2135f7a93d454976f61dcbaf9133a669b0c76992c8914f5&ipo=images"-->
+        <!--                 alt="qrcode" class="qrcode">-->
+        <img src="data:image/png;base64,{{ qr_code }}" alt="Verify Certificate" class="qrcode">
     </div>
 </div>
 </body>
