@@ -20,6 +20,7 @@ SECRET_KEY = config('DJANGO_SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 # DEBUG = True
 ALLOWED_HOSTS = ['web-production-d4808.up.railway.app', '*']
+CSRF_TRUSTED_ORIGINS = ['https://web-production-d4808.up.railway.app']
 
 # Application definition
 
@@ -84,7 +85,6 @@ WSGI_APPLICATION = 'ucode.wsgi.application'
 #     }
 # }
 
-CSRF_TRUSTED_ORIGINS = ['https://web-production-d4808.up.railway.app']
 
 DATABASES = {
     'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=1800)
