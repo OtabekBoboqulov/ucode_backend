@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'ucode.wsgi.application'
 
 
 DATABASES = {
-    'default': dj_database_url.config(default=os.environ.get('DATABASE_URL'), conn_max_age=1800)
+    'default': dj_database_url.config(default=config('DATABASE_URL'), conn_max_age=1800)
 }
 
 # Password validation

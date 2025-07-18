@@ -87,7 +87,7 @@ class MultipleOptionsQuestion(Component):
 
 class CodingQuestion(Component):
     question = models.TextField()
-    students = models.ManyToManyField(CustomUser, related_name='coding_questions', null=True, blank=True)
+    students = models.ManyToManyField(CustomUser, related_name='coding_questions', blank=True)
 
     def save(self, *args, **kwargs):
         self.type = 'coding'
