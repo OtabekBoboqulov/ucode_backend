@@ -73,7 +73,6 @@ def courses_update(request, course_id):
     return Response({'message': 'Method not allowed'})
 
 
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def lessons_details(request, lesson_id):
@@ -242,14 +241,15 @@ class GenerateCertificateView(APIView):
 
             serializer = CertificateSerializer(certificate)
 
-            verification_url = f'{request.build_absolute_uri(settings.BASE_URL)}/api/verify-certificate/{certificate_id}/'
+            verification_data = (f'Sertifikat {user.get_full_name()}ga {course.name} kursini muvaffaqiyatli yakunlaganu'
+                                 f' uchun {certificate.issue_date} sanasida berildi')
             qr = qrcode.QRCode(
                 version=1,
                 error_correction=qrcode.constants.ERROR_CORRECT_L,
                 box_size=10,
                 border=4,
             )
-            qr.add_data(verification_url)
+            qr.add_data(verification_data)
             qr.make(fit=True)
             img = qr.make_image(fill_color="darkblue", back_color="white")
             buffered = BytesIO()
