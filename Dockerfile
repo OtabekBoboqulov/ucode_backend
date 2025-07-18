@@ -22,4 +22,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Run migrations, collect static, and start Gunicorn
-CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn ucode.wsgi:application --bind 0.0.0.0:$PORT"]
+#CMD ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput && gunicorn ucode.wsgi:application --bind 0.0.0.0:$PORT"]
