@@ -92,8 +92,10 @@
         }
 
         .qrcode {
-          margin-top: 10px;
-          width: 120px !important;
+          width: 120px;
+          position: absolute;
+          right: 30px;
+          bottom: 30px;
         }
     </style>
 </head>
@@ -136,8 +138,8 @@
         code: {{ certificate_id }}
     </div>
     <div>
-        <!--        <img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.b51Dv6nVMjWntrwxD7VEiwHaHa%3Fpid%3DApi&f=1&ipt=c8a88290c4ec463af2135f7a93d454976f61dcbaf9133a669b0c76992c8914f5&ipo=images"-->
-        <!--                 alt="qrcode" class="qrcode">-->
+        <!--<img src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Ftse2.mm.bing.net%2Fth%2Fid%2FOIP.b51Dv6nVMjWntrwxD7VEiwHaHa%3Fpid%3DApi&f=1&ipt=c8a88290c4ec463af2135f7a93d454976f61dcbaf9133a669b0c76992c8914f5&ipo=images"-->
+        <!--alt="qrcode" class="qrcode">-->
         <img src="data:image/png;base64,{{ qr_code }}" alt="Verify Certificate" class="qrcode">
     </div>
 </div>
