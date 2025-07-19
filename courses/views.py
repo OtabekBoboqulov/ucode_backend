@@ -178,6 +178,12 @@ def courses_lessons(request, course_id):
 @api_view(['POST'])
 @staff_required
 def lessons_create(request):
+    if request.data.get('lessonId'):
+        try:
+            lesson = Lesson.objects.get(id=request.data['lessonId'])
+            lesson.delete()
+        except Lesson.DoesNotExist:
+            return Response({'message': 'Lesson not found'}, status=status.HTTP_404_NOT_FOUND)
     data = request.data
     course = Course.objects.get(id=data['course_id'])
     lesson = Lesson(course=course, serial_number=data['serial_number'], title=data['title'],
