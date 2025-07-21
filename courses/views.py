@@ -91,6 +91,8 @@ def lessons_start(request, lesson_id):
     user_lesson = UserLesson(user=request.user, lesson=lesson)
     user_lesson.score = sum(
         [component.max_score for component in lesson.components.all() if component.type in ['video', 'text']])
+    if user_lesson.score >= 80:
+        user_lesson.is_completed = True
     user_lesson.save()
     return Response(
         {
