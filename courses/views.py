@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from weasyprint import HTML
 from django.conf import settings
+from django.db.models import Sum
 
 from .models import Course, Lesson, Component, MultipleChoiceQuestion, MultipleOptionsQuestion, Video, Text, \
     MultipleChoiceOption, MultipleOptionsOption, Certificate
@@ -124,7 +125,8 @@ def lessons_delete(request, lesson_id):
 def task_check(request, component_id):
     component = Component.objects.get(id=component_id)
     user_lesson = UserLesson.objects.get(user=request.user, lesson=component.lesson)
-    user_course = UserCourse.objects.get(user=request.user, course=component.lesson.course)
+    course = component.lesson.course
+    user_course = UserCourse.objects.get(user=request.user, course=course)
     has_user_component = UserComponent.objects.filter(user=request.user, component=component).exists()
     is_correct = False
     if has_user_component:
@@ -153,7 +155,8 @@ def task_check(request, component_id):
     if user_lesson.score >= 80:
         user_lesson.is_completed = True
         user_course.progress += component.lesson.max_score
-        if user_course.progress >= 100:
+        total_score = course.lessons.aggregate(total_score=Sum('components__max_score'))['total_score']
+        if user_course.progress >= total_score:
             user_course.is_completed = True
         user_course.save()
     elif user_lesson.is_completed:

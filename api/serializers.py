@@ -3,6 +3,7 @@ from datetime import datetime
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from drf_polymorphic.serializers import PolymorphicSerializer
+from django.db.models import Sum
 from user.models import CustomUser, UserLesson, UserCourse
 from courses.models import (
     Course, Lesson, Component, Video, Text, MultipleChoiceQuestion, MultipleOptionsQuestion, CodingQuestion,
@@ -20,6 +21,7 @@ class UserCourseSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     time_since_creation = serializers.SerializerMethodField()
+    total_score = serializers.SerializerMethodField()
     user_courses = UserCourseSerializer(source='usercourse_set', many=True, read_only=True)
 
     class Meta:
@@ -32,6 +34,9 @@ class CourseSerializer(serializers.ModelSerializer):
         months = days // 30
         years = days // 365
         return {'days': days, 'months': months, 'years': years}
+
+    def get_total_score(self, obj):
+        return obj.lessons.aggregate(total=Sum('max_score'))['total'] or 0
 
 
 class UserLessonSerializer(serializers.ModelSerializer):
