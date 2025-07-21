@@ -157,7 +157,7 @@ def task_check(request, component_id):
     if user_lesson.score >= 80:
         user_lesson.is_completed = True
         user_course.progress += component.lesson.max_score
-        total_score = course.lessons.aggregate(total_score=Sum('components__max_score'))['total_score']
+        total_score = course.lessons.aggregate(total_score=Sum('max_score'))['total_score']
         if user_course.progress >= total_score:
             user_course.is_completed = True
         user_course.save()
