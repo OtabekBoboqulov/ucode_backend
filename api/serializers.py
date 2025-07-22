@@ -1,9 +1,10 @@
+import requests
+import cloudinary.uploader
 from django.utils import timezone
-from datetime import datetime
-from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from drf_polymorphic.serializers import PolymorphicSerializer
+from rest_framework import serializers
 from django.db.models import Sum
+from rest_framework_simplejwt.tokens import RefreshToken
 from user.models import CustomUser, UserLesson, UserCourse
 from courses.models import (
     Course, Lesson, Component, Video, Text, MultipleChoiceQuestion, MultipleOptionsQuestion, CodingQuestion,
@@ -156,6 +157,15 @@ class CustomUserWithLessonsSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'user_lessons']
 
 
+class CertificateSerializer(serializers.ModelSerializer):
+    student = serializers.StringRelatedField(read_only=True)
+    course = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Certificate
+        fields = '__all__'
+
+
 class SignupSerializer(serializers.ModelSerializer):
     profile_image = serializers.ImageField(required=False)
 
@@ -182,15 +192,6 @@ class SignupSerializer(serializers.ModelSerializer):
         return user
 
 
-class CertificateSerializer(serializers.ModelSerializer):
-    student = serializers.StringRelatedField(read_only=True)
-    course = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = Certificate
-        fields = '__all__'
-
-
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
@@ -209,3 +210,78 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'is_staff': self.user.is_staff,
         })
         return data
+
+
+class GoogleAuthSerializer(serializers.Serializer):
+    id_token = serializers.CharField(required=True)
+    provider = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        if attrs.get('provider') != 'google':
+            raise serializers.ValidationError({'provider': 'Provider must be "google"'})
+
+        id_token = attrs.get('id_token')
+        try:
+            # Verify Google ID token
+            response = requests.get(f'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token={id_token}')
+            if response.status_code != 200:
+                raise serializers.ValidationError({'id_token': 'Invalid Google ID token'})
+            google_data = response.json()
+            email = google_data.get('email')
+            if not email:
+                raise serializers.ValidationError({'email': 'Email not provided by Google'})
+            attrs['google_data'] = google_data
+        except Exception as e:
+            raise serializers.ValidationError({'id_token': f'Error verifying token: {str(e)}'})
+        return attrs
+
+    def create(self, validated_data):
+        google_data = validated_data['google_data']
+        email = google_data['email']
+        first_name = google_data.get('given_name', '')
+        last_name = google_data.get('family_name', '')
+        username = email[:email.index('@')]
+
+        # Check if user exists
+        try:
+            user = CustomUser.objects.get(email=email)
+            is_new_user = False
+        except CustomUser.DoesNotExist:
+            # Create new user
+            user = CustomUser.objects.create_user(
+                username=username,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                password=None  # No password for Google users
+            )
+            # Optionally fetch profile image
+            if google_data.get('picture'):
+                response = requests.get(google_data['picture'])
+                if response.status_code == 200:
+                    upload_result = cloudinary.uploader.upload(
+                        response.content,
+                        public_id=f'{username}_profile',
+                        folder='ucode/profile_images',
+                        resource_type='image'
+                    )
+                    user.profile_image = upload_result['public_id']
+                else:
+                    user.profile_image = 'ucode/profile_images/hyqi9y5ucjmgigtlrmth'
+            user.save()
+            is_new_user = True
+
+        # Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'profile_image': user.profile_image if is_new_user else user.profile_image.public_id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'is_staff': user.is_staff,
+            'is_new_user': is_new_user  # Flag to indicate if user was created
+        }

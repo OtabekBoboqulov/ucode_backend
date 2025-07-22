@@ -6,9 +6,20 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 import cloudinary.uploader
-from api.serializers import SignupSerializer, CustomTokenObtainPairSerializer, CourseSerializer
+from api.serializers import SignupSerializer, CustomTokenObtainPairSerializer, CourseSerializer, GoogleAuthSerializer
 from .models import CustomUser
 from courses.models import Course
+
+
+class GoogleAuthView(generics.CreateAPIView):
+    serializer_class = GoogleAuthSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        result = serializer.save()
+        return Response(result, status=status.HTTP_200_OK if not result['is_new_user'] else status.HTTP_201_CREATED)
 
 
 class SignupView(generics.CreateAPIView):
