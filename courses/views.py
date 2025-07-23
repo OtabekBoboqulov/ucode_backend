@@ -15,7 +15,8 @@ from django.conf import settings
 from django.db.models import Sum
 
 from .models import Course, Lesson, Component, MultipleChoiceQuestion, MultipleOptionsQuestion, Video, Text, \
-    MultipleChoiceOption, MultipleOptionsOption, Certificate
+    MultipleChoiceOption, MultipleOptionsOption, Certificate, CodingQuestion
+from .utils import test_code
 from user.models import UserLesson, UserComponent, UserCourse
 from api.serializers import CourseSerializer, LessonSerializer, UserLessonSerializer, CertificateSerializer
 from api.decorators import staff_required
@@ -148,6 +149,21 @@ def task_check(request, component_id):
         answers = len([1 for option in moq_component.options.all() if option.is_correct])
         user_answer = request.data['answer']
         if len(user_answer) == answers and 'false' not in user_answer:
+            user_lesson.score += component.max_score
+            user_component.score = component.max_score
+            is_correct = True
+        else:
+            user_component.score = 0
+    elif component.type == 'coding':
+        coding_question = CodingQuestion.objects.get(id=component_id)
+        tests = coding_question.tests.all()
+        language = coding_question.language
+        source_code = request.data['answer']
+        results = []
+        for test in tests:
+            test_result = test_code(source_code, test.input, test.output, language)
+            results.append(test_result)
+        if all(results):
             user_lesson.score += component.max_score
             user_component.score = component.max_score
             is_correct = True

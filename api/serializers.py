@@ -101,7 +101,7 @@ class CodingQuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CodingQuestion
-        fields = ('question', 'tests', 'students')
+        fields = '__all__'
 
 
 # Component Serializer with custom logic

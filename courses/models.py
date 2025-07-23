@@ -86,7 +86,16 @@ class MultipleOptionsQuestion(Component):
 
 
 class CodingQuestion(Component):
+    LANGUAGE_CHOICES = (
+        ('python', 'Python'),
+        ('java', 'Java'),
+        ('c', 'C'),
+        ('c++', 'C++'),
+        ('javascript', 'Javascript'),
+    )
+    language = models.CharField(max_length=15, choices=LANGUAGE_CHOICES, default='python')
     question = models.TextField()
+    pre_written_code = models.TextField(blank=True, null=True)
     students = models.ManyToManyField(CustomUser, related_name='coding_questions', blank=True)
 
     def save(self, *args, **kwargs):
@@ -108,7 +117,7 @@ class MultipleOptionsOption(models.Model):
 
 class CodingTest(models.Model):
     question = models.ForeignKey(CodingQuestion, on_delete=models.CASCADE, related_name='tests')
-    input = models.TextField()
+    input = models.TextField(blank=True, null=True)
     output = models.TextField()
 
 
