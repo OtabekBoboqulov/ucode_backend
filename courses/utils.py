@@ -17,7 +17,7 @@ def test_code(source_code, inpt, output, language):
     payload = {
         "language_id": language_codes[language],
         "source_code": source_code,
-        "stdin": inpt
+        "stdin": f'{inpt}\n' if inpt else ''
     }
 
     headers = {

@@ -15,7 +15,7 @@ from django.conf import settings
 from django.db.models import Sum
 
 from .models import Course, Lesson, Component, MultipleChoiceQuestion, MultipleOptionsQuestion, Video, Text, \
-    MultipleChoiceOption, MultipleOptionsOption, Certificate, CodingQuestion
+    MultipleChoiceOption, MultipleOptionsOption, Certificate, CodingQuestion, CodingTest
 from .utils import test_code
 from user.models import UserLesson, UserComponent, UserCourse
 from api.serializers import CourseSerializer, LessonSerializer, UserLessonSerializer, CertificateSerializer
@@ -240,6 +240,14 @@ def lessons_create(request):
                 moq_option = MultipleOptionsOption(question=moq_component, is_correct=option['is_correct'],
                                                    option=option['option'])
                 moq_option.save()
+        elif component['type'] == 'coding':
+            coding_question = CodingQuestion(lesson=lesson, max_score=component['max_score'],
+                                             serial_number=component['serial_number'], question=component['question'],
+                                             language=component['language'], pre_written_code=component['pre_written_code'])
+            coding_question.save()
+            for test in component['tests']:
+                coding_test = CodingTest(question=coding_question, input=test['input'], output=test['output'])
+                coding_test.save()
     return Response({'message': 'Lesson created successfully'})
 
 
