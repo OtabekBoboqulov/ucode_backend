@@ -58,7 +58,7 @@ def user_courses(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def user_update(request):
-    if CustomUser.objects.filter(username=request.data['username']).exists():
+    if CustomUser.objects.filter(username=request.data['username']).exists() and request.user.id != CustomUser.objects.get(username=request.data['username']).id:
         return Response({'message': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
     user = request.user
     data = request.data
