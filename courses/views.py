@@ -302,7 +302,7 @@ class GenerateCertificateView(APIView):
 
             # Generate PDF, respecting the template's @page settings
             response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = f'attachment; filename="certificate_{certificate.certificate_id}.pdf"'
+            response['Content-Disposition'] = f'attachment; filename="mucode_certificate_{certificate.certificate_id}.pdf"'
             HTML(string=html_string, base_url=request.build_absolute_uri()).write_pdf(
                 response,
                 stylesheets=[],
