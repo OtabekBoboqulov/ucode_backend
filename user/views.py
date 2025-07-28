@@ -8,7 +8,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import cloudinary.uploader
 from api.serializers import SignupSerializer, CustomTokenObtainPairSerializer, CourseSerializer, GoogleAuthSerializer
 from .models import CustomUser
-from courses.models import Course
+from courses.models import Course, Certificate
 
 
 class GoogleAuthView(generics.CreateAPIView):
@@ -58,7 +58,9 @@ def user_courses(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def user_update(request):
-    if CustomUser.objects.filter(username=request.data['username']).exists() and request.user.id != CustomUser.objects.get(username=request.data['username']).id:
+    if CustomUser.objects.filter(
+            username=request.data['username']).exists() and request.user.id != CustomUser.objects.get(
+        username=request.data['username']).id:
         return Response({'message': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
     user = request.user
     data = request.data
@@ -73,3 +75,12 @@ def user_update(request):
     user.save()
     image_url = user.profile_image.url
     return Response({'message': 'User updated successfully', 'profile_image': image_url})
+
+
+@api_view(['GET'])
+def statistics(request):
+    courses_count = Course.objects.count()
+    users_count = CustomUser.objects.count()
+    certificates_count = Certificate.objects.count()
+    return Response(
+        {'courses_count': courses_count, 'users_count': users_count, 'certificates_count': certificates_count})
