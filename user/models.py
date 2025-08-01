@@ -19,6 +19,7 @@ class UserCourse(models.Model):
     is_completed = models.BooleanField(default=False)
     progress = models.PositiveIntegerField(default=0)
     enrolled_at = models.DateTimeField(auto_now_add=True)
+    is_vip = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.user.username} - {self.course.name}'
