@@ -80,7 +80,10 @@ def courses_update(request, course_id):
 def lessons_details(request, lesson_id):
     lesson = Lesson.objects.get(id=lesson_id)
     lesson_serialized = LessonSerializer(lesson)
-    return Response(lesson_serialized.data)
+    course = lesson.course
+    user_course = UserCourse.objects.get(user=request.user, course=course)
+    is_vip = user_course.is_vip
+    return Response({'lesson': lesson_serialized.data, 'is_vip': is_vip})
 
 
 @api_view(['POST'])
