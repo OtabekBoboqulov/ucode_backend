@@ -79,7 +79,7 @@ def user_update(request):
 
 @api_view(['GET'])
 def statistics(request):
-    courses_count = Course.objects.count()
+    courses_count = Course.objects.filter(is_published=True).count()
     users_count = CustomUser.objects.count()
     certificates_count = Certificate.objects.count()
     return Response(
