@@ -17,6 +17,7 @@ class Course(models.Model):
     banner_image = CloudinaryField('image', folder='ucode/course_banners',
                                    default='ucode/course_banners/ar96xy769kralsw28gu0', overwrite=True)
     learners = models.ManyToManyField(CustomUser, related_name='courses', through=UserCourse)
+    is_published = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.name} - {self.complexity}'
