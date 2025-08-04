@@ -75,6 +75,24 @@ def courses_update(request, course_id):
     return Response({'message': 'Method not allowed'})
 
 
+@api_view(['POST'])
+@staff_required
+def courses_publish(request, course_id):
+    course = Course.objects.get(id=course_id)
+    course.is_published = True
+    course.save()
+    return Response({'message': 'Kurs nashr qilindi'})
+
+
+@api_view(['POST'])
+@staff_required
+def courses_unpublish(request, course_id):
+    course = Course.objects.get(id=course_id)
+    course.is_published = False
+    course.save()
+    return Response({'message': 'Kurs arxivlandi'})
+
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def lessons_details(request, lesson_id):

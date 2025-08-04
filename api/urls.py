@@ -5,7 +5,7 @@ from user.views import SignupView, CustomTokenObtainPairView, GoogleAuthView, Lo
 from courses.views import (
     courses_index, courses_create, courses_details, lessons_details, lessons_start, task_check, courses_lessons,
     lessons_next, lessons_create, courses_delete, lessons_delete, GenerateCertificateView, courses_update,
-    verify_certificate
+    verify_certificate, courses_publish, courses_unpublish
 )
 
 urlpatterns = [
@@ -21,6 +21,8 @@ urlpatterns = [
     path('courses/delete/<int:course_id>/', courses_delete),
     path('courses/update/<int:course_id>/', courses_update),
     path('courses/certificate/<int:course_id>/', GenerateCertificateView.as_view()),
+    path('courses/publish/<int:course_id>/', courses_publish),
+    path('courses/unpublish/<int:course_id>/', courses_unpublish),
     path('courses/create/', courses_create),
     path('courses/enrolled/', user_courses),
     path('lessons/<int:lesson_id>/', lessons_details),
